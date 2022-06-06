@@ -16,7 +16,7 @@ def index(request):
 
 
 @api_view(['GET', 'POST', 'DELETE'])
-def api_note(request, note_id):
+def note(request, note_id):
     try:
         note = Note.objects.get(id=note_id)
     except Note.DoesNotExist:
@@ -36,19 +36,19 @@ def api_note(request, note_id):
     return Response(serialized_note.data)
 
 
-@api_view(['GET', 'POST'])
+@api_view(['GET', 'POST', 'DELETE'])
 @permission_classes([IsAuthenticated])
 def note_user(request):
 
     if request.method == "GET":
         notes = Note.objects.filter(user=request.user)
     
-    serialized_note = NoteSerializer(notes, many=True)
+    serialized_note = NoteSerializer(reversed(notes), many=True)
     return Response(serialized_note.data)
 
 @api_view(['GET', 'POST'])
 @permission_classes([IsAuthenticated])
-def api_note_all(request):
+def note_all(request):
 
     if request.method == "POST":
         new_note_data = request.data
@@ -63,7 +63,7 @@ def api_note_all(request):
     return Response(serialized_note.data)
 
 @api_view(['POST'])
-def api_get_token(request):
+def get_token(request):
     try:
         if request.method == 'POST':
             username = request.data['username']
@@ -83,9 +83,10 @@ def adiciona(request):
     if request.method == 'POST':
         new_note_data = request.data
         content = new_note_data['content']
+        photo   = new_note_data['photo']
         user = request.user
         if content!= "":                
-            notes = Note(title= null, content= content, user= user)
+            notes = Note(content= content, photo=photo, user= user)
             notes.save()
         return Response(status=200)
     else:
@@ -96,15 +97,18 @@ def cadastra(request):
     try:
         if request.method == 'POST':
             user       = request.data['username']
-            email      = request.data['password']
+            email      = request.data['email']
             password   = request.data['password']
             first_name = request.data['first_name']
             last_name  = request.data['last_name']
 
-            user = User.objects.create_user(username=user, email=email, password=password, 
-                                            first_name=first_name, last_name=last_name)
-            user.save()
-            return Response(status=200)
+            if user== '' or email== '' or password== '' or first_name== '' or last_name== '' or not email.endswith('@al.insper.edu.br'):
+                return Response(status=404)
+            else:
+                user = User.objects.create_user(username=user, email=email, password=password, 
+                                                first_name=first_name, last_name=last_name)
+                user.save()
+                return Response(status=200)
         else:
             return HttpResponseForbidden()
     except:
