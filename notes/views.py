@@ -1,3 +1,4 @@
+from hashlib import new
 from django.shortcuts import render, redirect
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
@@ -9,6 +10,7 @@ from rest_framework.permissions import IsAuthenticated
 from django.contrib.auth import authenticate
 from rest_framework.authtoken.models import Token
 from django.contrib.auth.models import User
+import time
 
 # SUAS OUTRAS FUNÇÕES CONTINUAM AQUI
 def index(request):
@@ -22,10 +24,11 @@ def note(request, note_id):
     except Note.DoesNotExist:
         raise Http404()
 
+
     if request.method == 'POST':
         new_note_data = request.data
-        note.title = new_note_data['title']
-        note.content = new_note_data['content']
+        note.title    = new_note_data['title']
+        note.content  = new_note_data['content']
         note.save()
 
     if request.method == 'DELETE':
@@ -60,7 +63,7 @@ def note_all(request):
     notes = Note.objects.all()
     
     serialized_note = NoteSerializer(reversed(notes), many=True)
-    return Response(serialized_note.data)
+    return Response(serialized_note.data)   
 
 @api_view(['POST'])
 def get_token(request):
@@ -82,11 +85,15 @@ def get_token(request):
 def adiciona(request):
     if request.method == 'POST':
         new_note_data = request.data
-        content = new_note_data['content']
-        photo   = new_note_data['photo']
-        user = request.user
+        content       = new_note_data['content']
+        photo         = new_note_data['photo']
+        username      = request.user.username
+        tempo         = new_note_data['time']
+        user          = request.user
         if content!= "":                
-            notes = Note(content= content, photo=photo, user= user)
+            notes = Note(content= content, photo=photo, 
+                        username=username, time=tempo,
+                	    user= user)
             notes.save()
         return Response(status=200)
     else:
