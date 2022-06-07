@@ -4,3 +4,9 @@
 
 ### Link para o Frontend:
 [https://github.com/Pedro2712/barbaraaaaaaaaaaaaaaaaa-backend.git](https://github.com/insper-tecnologias-web/projeto-3-barbaraaaaaaaaaaaaaaaaaaaa.git)
+
+### Códigos para rodar:
+
+```cmd
+python manage.py runserver
+```
