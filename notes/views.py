@@ -61,9 +61,10 @@ def note_all(request):
         note.save()
 
     notes = Note.objects.all()
+    print(notes.first())
     
-    serialized_note = NoteSerializer(reversed(notes), many=True)
-    return Response(serialized_note.data)   
+    serialized_note = NoteSerializer(reversed(notes), many=True, context={'request': request})
+    return Response(serialized_note.data)
 
 @api_view(['POST'])
 def get_token(request):
@@ -85,16 +86,17 @@ def get_token(request):
 def adiciona(request):
     if request.method == 'POST':
         new_note_data = request.data
+        print(new_note_data)
         content       = new_note_data['content']
-        photo         = new_note_data['photo']
+        photo         = new_note_data['myFile']
         username      = request.user.username
         tempo         = new_note_data['time']
         user          = request.user
-        if content!= "":                
-            notes = Note(content= content, photo=photo, 
-                        username=username, time=tempo,
-                	    user= user)
-            notes.save()
+
+        notes = Note(content= content, photo=photo, 
+                    username=username, time= tempo,
+                    user= user)
+        notes.save()
         return Response(status=200)
     else:
         return HttpResponseForbidden()
