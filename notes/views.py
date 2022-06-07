@@ -1,4 +1,5 @@
 from hashlib import new
+from telnetlib import STATUS
 from django.shortcuts import render, redirect
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
@@ -46,7 +47,7 @@ def note_user(request):
     if request.method == "GET":
         notes = Note.objects.filter(user=request.user)
     
-    serialized_note = NoteSerializer(reversed(notes), many=True)
+    serialized_note = NoteSerializer(reversed(notes), many=True, context={'request': request})
     return Response(serialized_note.data)
 
 @api_view(['GET', 'POST'])
@@ -112,12 +113,14 @@ def cadastra(request):
             last_name  = request.data['last_name']
 
             if user== '' or email== '' or password== '' or first_name== '' or last_name== '' or not email.endswith('@al.insper.edu.br'):
-                return Response(status=404)
+                return JsonResponse({"token": ''})
             else:
                 user = User.objects.create_user(username=user, email=email, password=password, 
                                                 first_name=first_name, last_name=last_name)
                 user.save()
-                return Response(status=200)
+                token, created = Token.objects.get_or_create(user=user)
+                print('entrou')
+                return JsonResponse({"token": token.key})
         else:
             return HttpResponseForbidden()
     except:
