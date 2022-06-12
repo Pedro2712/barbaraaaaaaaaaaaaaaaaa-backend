@@ -7,7 +7,7 @@ class NoteSerializer(serializers.ModelSerializer):
     photo_url = serializers.SerializerMethodField()
     class Meta:
         model = Note
-        fields = ['id', 'content', 'username', 'time', 'photo_url']
+        fields = ['id', 'content', 'username', 'time', 'photo_url', 'likesNuber']
 
     def get_photo_url(self, note):
         request = self.context.get('request')

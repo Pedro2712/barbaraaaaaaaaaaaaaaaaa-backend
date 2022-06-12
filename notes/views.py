@@ -1,17 +1,17 @@
-from hashlib import new
-from telnetlib import STATUS
-from django.shortcuts import render, redirect
+# from hashlib import new
+# from telnetlib import STATUS
+# from django.shortcuts import render, redirect
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from django.http import Http404, HttpResponse, HttpResponseForbidden, JsonResponse
-from sqlalchemy import null
+# from sqlalchemy import null
 from .models import Note, Favoritos
 from .serializers import NoteSerializer, FavSerializer
 from rest_framework.permissions import IsAuthenticated
 from django.contrib.auth import authenticate
 from rest_framework.authtoken.models import Token
 from django.contrib.auth.models import User
-import time
+# import time
 
 # SUAS OUTRAS FUNÇÕES CONTINUAM AQUI
 def index(request):
@@ -87,7 +87,6 @@ def get_token(request):
 def adiciona(request):
     if request.method == 'POST':
         new_note_data = request.data
-        print(new_note_data)
         content       = new_note_data['content']
         photo         = new_note_data['myFile']
         username      = request.user.username
@@ -142,6 +141,10 @@ def favorita(request):
 
         Fav = Favoritos(id_card= id_card, user= user)
         Fav.save()
+
+        note = Note.objects.get(id=id_card)
+        note.likesNuber+= 1
+        note.save()
         return Response(status=200)
 
     if request.method == 'DELETE':
@@ -149,4 +152,8 @@ def favorita(request):
         id_card = new_fav['id_card']
         desFav = Favoritos.objects.filter(id_card=id_card)
         desFav.delete()
+
+        note = Note.objects.get(id=id_card)
+        note.likesNuber-= 1
+        note.save()
         return Response(status=204)
